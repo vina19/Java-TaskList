@@ -98,21 +98,6 @@ public class toDoListDB {
         }
     }
 
-    public void deleteList(int listID){
-
-        try(Connection connection = DriverManager.getConnection(DB_CONNECTION_URL);
-            PreparedStatement preparedStatement = connection.prepareStatement(DELETE_LIST)){
-
-            preparedStatement.setInt(1, listID);
-            preparedStatement.executeUpdate();
-
-
-        }catch (SQLException e){
-            throw new RuntimeException(e);
-        }
-
-    }
-
     public void addNewList(String Class, String Description, Date dateCreated, Date DueDate){
 
         try(Connection connection = DriverManager.getConnection(DB_CONNECTION_URL);
@@ -127,6 +112,22 @@ public class toDoListDB {
             //preparedStatement.setDate(4, dueDate);
 
             preparedStatement.executeUpdate();
+
+        }catch (SQLException e){
+            throw new RuntimeException(e);
+        }
+
+    }
+
+
+    public void deleteList(int listID){
+
+        try(Connection connection = DriverManager.getConnection(DB_CONNECTION_URL);
+            PreparedStatement preparedStatement = connection.prepareStatement(DELETE_LIST)){
+
+            preparedStatement.setInt(1, listID);
+            preparedStatement.executeUpdate();
+
 
         }catch (SQLException e){
             throw new RuntimeException(e);
