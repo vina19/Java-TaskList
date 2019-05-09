@@ -1,4 +1,6 @@
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -12,7 +14,6 @@ public class toDoListGUI extends JFrame {
     private JPanel rootPanel;
     private JTextField classTextField;
     private JTextField descriptionTextField;
-    private JButton previewToDoListsButton;
     private JButton editButton;
     private JButton doneButton;
     private JButton deleteButton;
@@ -24,30 +25,27 @@ public class toDoListGUI extends JFrame {
     private JLabel fileNameLabel;
 
     private toDoListDB db;
+    private DefaultTableModel tableModel;
+    private Vector columnData;
 
 
     toDoListGUI(toDoListDB db) {
 
         this.db = db;
 
+        setContentPane(rootPanel);
         pack();
         setVisible(true);
-
-        setContentPane(rootPanel);
-        setPreferredSize(new Dimension(500,500));
+        setTitle("To Do List Manager");
 
         TodaysDateSpinner.setModel(new SpinnerDateModel());
         DueDateSpinner.setModel(new SpinnerDateModel());
 
+        toDoListTable.setDefaultEditor(Object.class, null);
+        toDoListTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
         addListeners();
-
-        setTitle("To Do List Manager");
-
-        Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DATE, 1);
-        cal.getTime();
-
-        getRootPane().setDefaultButton(previewToDoListsButton);
+        configureTable();
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
@@ -55,18 +53,10 @@ public class toDoListGUI extends JFrame {
 
     private void addListeners() {
 
-        selectAFileButton.addActionListener(new ActionListener() {
+        toDoListTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
-            public void actionPerformed(ActionEvent e) {
+            public void valueChanged(ListSelectionEvent e) {
 
-                JFileChooser fileChooser = new JFileChooser();
-
-                int returnVal = fileChooser.showOpenDialog(toDoListGUI.this);
-
-                if(returnVal == JFileChooser.APPROVE_OPTION){
-                    File fileSelected = fileChooser.getSelectedFile();
-                    fileNameLabel.setText(fileSelected.toString());
-                }
             }
         });
 
@@ -76,29 +66,16 @@ public class toDoListGUI extends JFrame {
 
                 String className = classTextField.getText();
                 String descToDoList = descriptionTextField.getText();
-                String fileData = fileNameLabel.getText();
                 Date todayDate = (Date)TodaysDateSpinner.getModel().getValue();
                 Date dueDate = (Date)DueDateSpinner.getModel().getValue();
-
+                String fileData = fileNameLabel.getText();
 
                 if(className == null && descToDoList == null){
                     JOptionPane.showMessageDialog(rootPanel, "Please enter a class and description of the task");
                 }
 
-                db.addNewList(className, descToDoList, fileData, todayDate, dueDate);
-            }
-        });
-
-        previewToDoListsButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                Vector columnToDoList = db.getColumnToDoLists();
-                Vector data = db.getAllLists();
-
-                DefaultTableModel tableModel = new DefaultTableModel(data, columnToDoList);
-                toDoListTable.setModel(tableModel);
-
+                db.addNewList(className, descToDoList, todayDate, dueDate, fileData);
+                configureTable();
             }
         });
 
@@ -106,7 +83,12 @@ public class toDoListGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
+                String className = classTextField.getText();
+                String descToDoList = descriptionTextField.getText();
+                Date dueDate = (Date)DueDateSpinner.getModel().getValue();
+                String fileData = fileNameLabel.getText();
 
+                db.editList(className, descToDoList, dueDate, fileData);
 
             }
         });
@@ -127,10 +109,36 @@ public class toDoListGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
+                int selectedRow = toDoListTable.getSelectedRow();
+
+                db.deleteList(selectedRow);
+
             }
         });
 
-    }
+        selectAFileButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
 
+                JFileChooser fileChooser = new JFileChooser();
+
+                int returnVal = fileChooser.showOpenDialog(toDoListGUI.this);
+
+                if(returnVal == JFileChooser.APPROVE_OPTION){
+                    File fileSelected = fileChooser.getSelectedFile();
+                    fileNameLabel.setText(fileSelected.toString());
+                }
+            }
+        });
+    }
+     private void configureTable(){
+
+        Vector columnData = db.getColumnToDoLists();
+        Vector<Vector> data = db.getAllLists();
+
+        DefaultTableModel tableModel = new DefaultTableModel(data, columnData);
+        toDoListTable.setModel(tableModel);
+
+     }
 
 }

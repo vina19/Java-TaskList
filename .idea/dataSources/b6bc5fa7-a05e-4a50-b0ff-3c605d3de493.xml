@@ -55,7 +55,11 @@
       <Position>5</Position>
       <DataType>DATE|0s</DataType>
     </column>
-    <key id="18" parent="7">
+    <column id="18" parent="7" name="FileData">
+      <Position>6</Position>
+      <DataType>TEXT|0s</DataType>
+    </column>
+    <key id="19" parent="7">
       <ColNames>id</ColNames>
       <Primary>1</Primary>
     </key>

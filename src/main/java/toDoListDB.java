@@ -10,25 +10,26 @@ public class toDoListDB {
 
     private static final String DB_CONNECTION_URL = "jdbc:sqlite:ToDoList.sqlite";
 
+    private static final String TABLE_NAME = "to_do_list_manager";
     private static final String ID_COL = "id";
     private static final String NAME_COL = "Class";
     private static final String DESC_COL = "Description";
+    private static final String DATE_COL = "Date Created";
+    private static final String DUE_DATE_COL = "Due Date";
     private static final String FILE_COL = "File";
-    private static final String DATE_COL = "Created Date";
-    private static final String DUEDATE_COL = "Due Date";
 
-    private static final String CREATE_TO_DO_LIST_TABLE = "CREATE TABLE IF NOT EXISTS to_do_list_manager (id INTEGER PRIMARY KEY, " +
-            "Class TEXT, Description TEXT, FileData TEXT, DateCreated DATE, DueDate DATE)";
+    private static final String CREATE_TO_DO_LIST_TABLE = "CREATE TABLE IF NOT EXISTS TABLE_NAME (id INTEGER PRIMARY KEY, " +
+            "Class TEXT, Description TEXT, DateCreated DATE, DueDate DATE, FileData TEXT)";
 
-    private static final String GET_ALL_LISTS = "SELECT * FROM to_do_list_manager";
+    private static final String GET_ALL_LISTS = "SELECT * FROM TABLE_NAME ";
 
-    private static final String EDIT_LIST = "UPDATE to_do_list_manager SET Class = ?, " +
-            "Description = ?, DueDate = ? WHERE Class = ?";
+    private static final String EDIT_LIST = "UPDATE TABLE_NAME SET Description = ?, " +
+            "DueDate = ?, FileData = ? WHERE id = ?";
 
-    private static final String DELETE_LIST = "DELETE FROM to_do_list_manager WHERE ID = ?";
+    private static final String DELETE_LIST = "DELETE FROM TABLE_NAME WHERE ID = ?";
 
-    private static final String ADD_TO_DO_LIST = "INSERT INTO to_do_list_manager " +
-            "(Class, Description, DateCreated, DueDate) VALUES (?, ?, ?, ?)";
+    private static final String ADD_TO_DO_LIST = "INSERT INTO TABLE_NAME " +
+            "(Class, Description, DateCreated, DueDate, FileData) VALUES (?, ?, ?, ?)";
 
 
     toDoListDB() {
@@ -53,9 +54,9 @@ public class toDoListDB {
         colToDoList.add(ID_COL);
         colToDoList.add(NAME_COL);
         colToDoList.add(DESC_COL);
-        colToDoList.add(FILE_COL);
         colToDoList.add(DATE_COL);
-        colToDoList.add(DUEDATE_COL);
+        colToDoList.add(DUE_DATE_COL);
+        colToDoList.add(FILE_COL);
 
         return colToDoList;
     }
@@ -71,24 +72,24 @@ public class toDoListDB {
 
             String Class, Description, FileData;
             int id;
-            Date dateCreated, dueDate;
+            Date DateCreated, DueDate;
 
             while (rs.next()) {
 
                 id = rs.getInt(ID_COL);
                 Class = rs.getString(NAME_COL);
                 Description = rs.getString(DESC_COL);
+                DateCreated = rs.getDate(DATE_COL);
+                DueDate = rs.getDate(DUE_DATE_COL);
                 FileData = rs.getString(FILE_COL);
-                dateCreated = rs.getDate(DATE_COL);
-                dueDate = rs.getDate(DUEDATE_COL);
 
                 Vector v = new Vector();
                 v.add(id);
                 v.add(Class);
                 v.add(Description);
+                v.add(DateCreated);
+                v.add(DueDate);
                 v.add(FileData);
-                v.add(dateCreated);
-                v.add(dueDate);
 
                 vectors.add(v);
             }
@@ -100,19 +101,23 @@ public class toDoListDB {
         }
     }
 
-    public void addNewList(String Class, String Description, String FileData, Date dateCreated, Date dueDate){
+    public void addNewList(String Class, String Description, Date DateCreated, Date dueDateTask, String FileData){
 
         try(Connection connection = DriverManager.getConnection(DB_CONNECTION_URL);
             PreparedStatement preparedStatement = connection.prepareStatement(ADD_TO_DO_LIST)){
 
-            long today_Date = System.currentTimeMillis();
+            long today_Date = DateCreated.getTime();
             java.sql.Date date = new java.sql.Date(today_Date);
+
+            long due_Date = dueDateTask.getTime();
+            java.sql.Date dueDate = new java.sql.Date(due_Date);
 
             preparedStatement.setString(1, Class);
             preparedStatement.setString(2, Description);
-            preparedStatement.setString(3, FileData);
-            preparedStatement.setDate(4, date);
-            preparedStatement.setDate(5, dueDate);
+            preparedStatement.setDate(3, date);
+            preparedStatement.setDate(4, dueDate);
+            preparedStatement.setString(5, FileData);
+
 
             preparedStatement.executeUpdate();
 
@@ -129,6 +134,28 @@ public class toDoListDB {
             PreparedStatement preparedStatement = connection.prepareStatement(DELETE_LIST)){
 
             preparedStatement.setInt(1, listID);
+            preparedStatement.executeUpdate();
+
+
+        }catch (SQLException e){
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public void editList(String Class, String Desc, Date dueDateTask, String File_Data){
+
+        try(Connection connection = DriverManager.getConnection(DB_CONNECTION_URL);
+            PreparedStatement preparedStatement = connection.prepareStatement(EDIT_LIST)) {
+
+            long due_Date = dueDateTask.getTime();
+            java.sql.Date dueDate = new java.sql.Date(due_Date);
+
+            preparedStatement.setString(1, Class);
+            preparedStatement.setString(2, Desc);
+            preparedStatement.setDate(3, dueDate);
+            preparedStatement.setString(4, File_Data);
+            
             preparedStatement.executeUpdate();
 
 
