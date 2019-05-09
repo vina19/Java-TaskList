@@ -14,9 +14,9 @@ public class toDoListDB {
     private static final String ID_COL = "id";
     private static final String NAME_COL = "Class";
     private static final String DESC_COL = "Description";
-    private static final String DATE_COL = "Date Created";
-    private static final String DUE_DATE_COL = "Due Date";
-    private static final String FILE_COL = "File";
+    private static final String DATE_COL = "DateCreated";
+    private static final String DUE_DATE_COL = "DueDate";
+    private static final String FILE_COL = "FileData";
 
     private static final String CREATE_TO_DO_LIST_TABLE = "CREATE TABLE IF NOT EXISTS TABLE_NAME (id INTEGER PRIMARY KEY, " +
             "Class TEXT, Description TEXT, DateCreated DATE, DueDate DATE, FileData TEXT)";
@@ -29,7 +29,7 @@ public class toDoListDB {
     private static final String DELETE_LIST = "DELETE FROM TABLE_NAME WHERE ID = ?";
 
     private static final String ADD_TO_DO_LIST = "INSERT INTO TABLE_NAME " +
-            "(Class, Description, DateCreated, DueDate, FileData) VALUES (?, ?, ?, ?)";
+            "(Class, Description, DateCreated, DueDate, FileData) VALUES (?, ?, ?, ?, ?)";
 
 
     toDoListDB() {
@@ -155,7 +155,7 @@ public class toDoListDB {
             preparedStatement.setString(2, Desc);
             preparedStatement.setDate(3, dueDate);
             preparedStatement.setString(4, File_Data);
-            
+
             preparedStatement.executeUpdate();
 
 
