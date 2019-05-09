@@ -25,8 +25,6 @@ public class toDoListGUI extends JFrame {
     private JLabel fileNameLabel;
 
     private toDoListDB db;
-    private DefaultTableModel tableModel;
-    private Vector columnData;
 
 
     toDoListGUI(toDoListDB db) {
@@ -43,6 +41,8 @@ public class toDoListGUI extends JFrame {
 
         toDoListTable.setDefaultEditor(Object.class, null);
         toDoListTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        toDoListTable.setRowSelectionAllowed(true);
+        toDoListTable.setColumnSelectionAllowed(false);
 
         addListeners();
         configureTable();
@@ -90,10 +90,31 @@ public class toDoListGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                int selectedRow = toDoListTable.getSelectedRow();
+                DefaultTableModel tableModel = (DefaultTableModel)toDoListTable.getModel();
 
-                db.deleteList(selectedRow);
+                int deleteConfirmation = JOptionPane.showConfirmDialog(null, "Are you sure to delete this task?",
+                            null, JOptionPane.YES_NO_OPTION);
 
+                if (deleteConfirmation == 0) {
+                    int selectedRow = toDoListTable.getSelectedRow();
+
+                    if(selectedRow == -1) {
+                        JOptionPane.showMessageDialog(rootPanel, "Please select a task to delete");
+                    }else{
+                        tableModel.removeRow(selectedRow);
+                        int id = (Integer) tableModel.getValueAt(selectedRow, 0);
+                        db.deleteList(id);
+                        configureTable();
+                        classTextField.setText("");
+                        descriptionTextField.setText("");
+                        fileNameLabel.setText("");
+                    }
+
+                    JOptionPane.showMessageDialog(rootPanel, "Task deleted successfully.");
+
+                } else {
+                    JOptionPane.showMessageDialog(rootPanel, "Stop task deletion");
+                }
 
             }
         });
@@ -102,10 +123,23 @@ public class toDoListGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                int selectedRow = toDoListTable.getSelectedRow();
+                DefaultTableModel tableModel = (DefaultTableModel)toDoListTable.getModel();
 
-                db.deleteList(selectedRow);
+                try {
+                    int selectedRow = toDoListTable.getSelectedRow();
 
+                    if (selectedRow == -1) {
+                        JOptionPane.showMessageDialog(rootPanel, "Please select a completed task.");
+                    } else {
+                        tableModel.removeRow(selectedRow);
+                        int id = (Integer) tableModel.getValueAt(selectedRow, 0);
+                        db.deleteList(id);
+                        configureTable();
+                        JOptionPane.showMessageDialog(rootPanel, "Awesome! You did this task on time/before the due date.");
+                    }
+                }catch (Exception ex){
+                    JOptionPane.showMessageDialog(null, ex);
+                }
             }
         });
 
@@ -124,7 +158,8 @@ public class toDoListGUI extends JFrame {
             }
         });
     }
-     private void configureTable(){
+
+    private void configureTable(){
 
         Vector columnData = db.getColumnToDoLists();
         Vector<Vector> data = db.getAllLists();
@@ -132,6 +167,5 @@ public class toDoListGUI extends JFrame {
         DefaultTableModel tableModel = new DefaultTableModel(data, columnData);
         toDoListTable.setModel(tableModel);
 
-     }
-
+    }
 }

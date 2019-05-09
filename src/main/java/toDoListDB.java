@@ -26,7 +26,7 @@ public class toDoListDB {
     private static final String EDIT_LIST = "UPDATE TABLE_NAME SET Description = ?, " +
             "DueDate = ?, FileData = ? WHERE id = ?";
 
-    private static final String DELETE_LIST = "DELETE FROM TABLE_NAME WHERE ID = ?";
+    private static final String DELETE_LIST = "DELETE FROM TABLE_NAME WHERE id = ?";
 
     private static final String ADD_TO_DO_LIST = "INSERT INTO TABLE_NAME " +
             "(Class, Description, DateCreated, DueDate, FileData) VALUES (?, ?, ?, ?, ?)";
@@ -38,8 +38,8 @@ public class toDoListDB {
 
     private void createTable() {
 
-        try(Connection conn = DriverManager.getConnection(DB_CONNECTION_URL);
-            Statement statement = conn.createStatement()){
+        try(Connection connection = DriverManager.getConnection(DB_CONNECTION_URL);
+            Statement statement = connection.createStatement()){
 
             statement.executeUpdate(CREATE_TO_DO_LIST_TABLE);
 
@@ -119,7 +119,7 @@ public class toDoListDB {
             preparedStatement.setString(5, FileData);
 
 
-            preparedStatement.executeUpdate();
+            preparedStatement.execute();
 
         }catch (SQLException e){
             throw new RuntimeException(e);
@@ -134,7 +134,7 @@ public class toDoListDB {
             PreparedStatement preparedStatement = connection.prepareStatement(DELETE_LIST)){
 
             preparedStatement.setInt(1, listID);
-            preparedStatement.executeUpdate();
+            preparedStatement.execute();
 
 
         }catch (SQLException e){
@@ -156,7 +156,7 @@ public class toDoListDB {
             preparedStatement.setDate(3, dueDate);
             preparedStatement.setString(4, File_Data);
 
-            preparedStatement.executeUpdate();
+            preparedStatement.execute();
 
 
         }catch (SQLException e){
