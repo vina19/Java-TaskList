@@ -53,13 +53,6 @@ public class toDoListGUI extends JFrame {
 
     private void addListeners() {
 
-        toDoListTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-
-            }
-        });
-
         AddNewListButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
