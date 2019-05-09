@@ -22,15 +22,13 @@ public class toDoListGUI extends JFrame {
     private JSpinner DueDateSpinner;
     private JButton selectAFileButton;
     private JLabel fileNameLabel;
-    private JButton getTodaysDateButton;
-    private JButton getDueDateButton;
 
-    private toDoListDB database;
+    private toDoListDB db;
 
 
-    toDoListGUI() {
+    toDoListGUI(toDoListDB db) {
 
-        database = new toDoListDB();
+        this.db = db;
 
         pack();
         setVisible(true);
@@ -57,22 +55,6 @@ public class toDoListGUI extends JFrame {
 
     private void addListeners() {
 
-        getTodaysDateButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                Date d = (Date)TodaysDateSpinner.getModel().getValue();
-            }
-        });
-
-        getDueDateButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                Date d = (Date)DueDateSpinner.getModel().getValue();
-            }
-        });
-
         selectAFileButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -94,6 +76,7 @@ public class toDoListGUI extends JFrame {
 
                 String className = classTextField.getText();
                 String descToDoList = descriptionTextField.getText();
+                String fileData = fileNameLabel.getText();
                 Date todayDate = (Date)TodaysDateSpinner.getModel().getValue();
                 Date dueDate = (Date)DueDateSpinner.getModel().getValue();
 
@@ -101,8 +84,8 @@ public class toDoListGUI extends JFrame {
                 if(className == null && descToDoList == null){
                     JOptionPane.showMessageDialog(rootPanel, "Please enter a class and description of the task");
                 }
-                
-                database.addNewList(className, descToDoList, todayDate, dueDate);
+
+                db.addNewList(className, descToDoList, fileData, todayDate, dueDate);
             }
         });
 
@@ -110,8 +93,8 @@ public class toDoListGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                Vector columnToDoList = database.getColumnToDoLists();
-                Vector data = database.getAllLists();
+                Vector columnToDoList = db.getColumnToDoLists();
+                Vector data = db.getAllLists();
 
                 DefaultTableModel tableModel = new DefaultTableModel(data, columnToDoList);
                 toDoListTable.setModel(tableModel);
@@ -134,7 +117,7 @@ public class toDoListGUI extends JFrame {
 
                 int selectedRow = toDoListTable.getSelectedRow();
 
-
+                db.deleteList(selectedRow);
 
 
             }
