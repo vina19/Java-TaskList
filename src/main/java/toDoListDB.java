@@ -32,6 +32,8 @@ public class toDoListDB {
             "(Class, Description, DateCreated, DueDate, FileData) VALUES (?, ?, ?, ?, ?)";
 
 
+
+
     toDoListDB() {
         createTable();
     }
@@ -143,18 +145,22 @@ public class toDoListDB {
 
     }
 
-    public void editList(String Class, String Desc, Date dueDateTask, String File_Data){
+    public void editList(String Class, String Desc, Date todayDate, Date dueDateTask, String File_Data){
 
         try(Connection connection = DriverManager.getConnection(DB_CONNECTION_URL);
             PreparedStatement preparedStatement = connection.prepareStatement(EDIT_LIST)) {
+
+            long today_Date = todayDate.getTime();
+            java.sql.Date date = new java.sql.Date(today_Date);
 
             long due_Date = dueDateTask.getTime();
             java.sql.Date dueDate = new java.sql.Date(due_Date);
 
             preparedStatement.setString(1, Class);
             preparedStatement.setString(2, Desc);
-            preparedStatement.setDate(3, dueDate);
-            preparedStatement.setString(4, File_Data);
+            preparedStatement.setDate(3, date);
+            preparedStatement.setDate(4, dueDate);
+            preparedStatement.setString(5, File_Data);
 
             preparedStatement.execute();
 
