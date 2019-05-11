@@ -2,6 +2,7 @@ import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -223,9 +224,11 @@ public class toDoListGUI extends JFrame {
 
     private void sort(){
 
+        TableRowSorter<DefaultTableModel> sorter =
+                new TableRowSorter<DefaultTableModel>((DefaultTableModel)toDoListTable.getModel());
 
-
-
+        toDoListTable.setRowSorter(sorter);
+        
     }
 
 }
