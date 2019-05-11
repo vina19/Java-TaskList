@@ -32,42 +32,62 @@ public class toDoListGUI extends JFrame {
     toDoListGUI(toDoListDB db) {
 
         this.db = db;
-
         setContentPane(rootPanel);
         pack();
         setVisible(true);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+
+        //Create a title.
         setTitle("To Do List Manager");
 
+        //Create a model for JSpinners
         TodaysDateSpinner.setModel(new SpinnerDateModel());
         DueDateSpinner.setModel(new SpinnerDateModel());
 
+        //Method to make a toDoListTable non-editable.
         toDoListTable.setDefaultEditor(Object.class, null);
+
+        //A user can only select one row.
         toDoListTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        //a generic sorter
+        toDoListTable.setAutoCreateRowSorter(true);
+
+        //A user can only select row and not column.
         toDoListTable.setRowSelectionAllowed(true);
         toDoListTable.setColumnSelectionAllowed(false);
 
+        //Method to configure the table model.
         configureTable();
-        addList();
+        //Adding listeners.
+        addListeners();
+        //Sorting data.
+        sort();
+    }
 
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+    private void addListeners(){
 
         AddNewListButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                addList();
+                String className = classTextField.getText();
+                String descToDoList = descriptionTextField.getText();
+                Date todayDate = (Date)TodaysDateSpinner.getModel().getValue();
+                Date dueDate = (Date)DueDateSpinner.getModel().getValue();
+                String fileData = fileNameLabel.getText();
 
-                int lastRow = toDoListTable.getRowCount() - 1;
-                toDoListTable.setRowSelectionInterval(lastRow, lastRow);
+                classTextField.setText("");
+                descriptionTextField.setText("");
+                DueDateSpinner.setValue(todayDate);
+                fileNameLabel.setText("");
 
-                //Getting selected row data from table to textFields.
-                //Found this from http://1bestcsharp.blogspot.com/2015/05/java-jtable-add-delete-update-row.html
+                if(className == null && descToDoList == null){
+                    JOptionPane.showMessageDialog(rootPanel, "Please filled the task information.");
+                }
 
-//              String className = (toDoListTable.getModel().getValueAt(selectedRowIndex, 1).toString());
-//              String descTask = (toDoListTable.getModel().getValueAt(selectedRowIndex, 2).toString());
-//              String todayDate = (toDoListTable.getModel().getValueAt(selectedRowIndex, 3).toString());
-//              String dueDate = (toDoListTable.getModel().getValueAt(selectedRowIndex, 4).toString());
-//              String fileData = (toDoListTable.getModel().getValueAt(selectedRowIndex, 5).toString());
+                db.addNewList(className, descToDoList, todayDate, dueDate, fileData);
+                configureTable();
             }
         });
 
@@ -75,19 +95,16 @@ public class toDoListGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                DefaultTableModel tableModel = (DefaultTableModel)toDoListTable.getModel();
+                int selectedRowIndex = toDoListTable.getSelectedRow();
 
                 try{
-                    toDoListTable.setModel(tableModel);
-                    int selectedRowIndex = toDoListTable.getSelectedRow();
-
                     //Getting selected row data from table to textFields.
                     //Found this from http://1bestcsharp.blogspot.com/2015/05/java-jtable-add-delete-update-row.html
-                    classTextField.setText(tableModel.getValueAt(selectedRowIndex, 1).toString());
-                    descriptionTextField.setText(tableModel.getValueAt(selectedRowIndex, 2).toString());
-                    TodaysDateSpinner.setValue(tableModel.getValueAt(selectedRowIndex, 3).toString());
-                    DueDateSpinner.setValue(tableModel.getValueAt(selectedRowIndex, 4).toString());
-                    fileNameLabel.setText(tableModel.getValueAt(selectedRowIndex, 5).toString());
+                    classTextField.setText(toDoListTable.getModel().getValueAt(selectedRowIndex, 1).toString());
+                    descriptionTextField.setText(toDoListTable.getModel().getValueAt(selectedRowIndex, 2).toString());
+                    TodaysDateSpinner.setValue(toDoListTable.getModel().getValueAt(selectedRowIndex, 3).toString());
+                    DueDateSpinner.setValue(toDoListTable.getModel().getValueAt(selectedRowIndex, 4).toString());
+                    fileNameLabel.setText(toDoListTable.getModel().getValueAt(selectedRowIndex, 5).toString());
 
                 }catch (IndexOutOfBoundsException i){
                     System.out.println("Please select a row.");
@@ -105,14 +122,14 @@ public class toDoListGUI extends JFrame {
                     int selectedRowIndex = toDoListTable.getSelectedRow();
 
                     if(selectedRowIndex >= 0){
-                        String className = classTextField.getText();
-                        String descToDoList = descriptionTextField.getText();
-                        Date todayDate = (Date)TodaysDateSpinner.getModel().getValue();
-                        Date dueDate = (Date)DueDateSpinner.getModel().getValue();
-                        String fileData = fileNameLabel.getText();
+                        String class_name = classTextField.getText();
+                        String desc_task = descriptionTextField.getText();
+                        Date today_date = (Date)TodaysDateSpinner.getValue();
+                        Date due_date = (Date)DueDateSpinner.getValue();
+                        String file_name = fileNameLabel.getText();
+                        int task_id = Integer.parseInt(toDoListTable.getModel().getValueAt(selectedRowIndex, 0).toString());
 
-                        db.editList(className, descToDoList, todayDate, dueDate, fileData);
-                        addList();
+                        db.editList(class_name, desc_task, today_date, due_date, file_name, task_id);
                         configureTable();
 
                     }else{
@@ -192,7 +209,6 @@ public class toDoListGUI extends JFrame {
                 }
             }
         });
-
     }
 
     private void configureTable(){
@@ -205,20 +221,10 @@ public class toDoListGUI extends JFrame {
 
     }
 
-    private void addList(){
+    private void sort(){
 
-        String className = classTextField.getText();
-        String descToDoList = descriptionTextField.getText();
-        Date todayDate = (Date)TodaysDateSpinner.getModel().getValue();
-        Date dueDate = (Date)DueDateSpinner.getModel().getValue();
-        String fileData = fileNameLabel.getText();
 
-        if(className == null && descToDoList == null){
-            JOptionPane.showMessageDialog(rootPanel, "Please enter a class and description of the task");
-        }
 
-        db.addNewList(className, descToDoList, todayDate, dueDate, fileData);
-        configureTable();
 
     }
 

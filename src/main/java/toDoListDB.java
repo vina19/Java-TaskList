@@ -23,8 +23,8 @@ public class toDoListDB {
 
     private static final String GET_ALL_LISTS = "SELECT * FROM TABLE_NAME ";
 
-    private static final String EDIT_LIST = "UPDATE TABLE_NAME SET Description = ?, " +
-            "DueDate = ?, FileData = ? WHERE id = ?";
+    private static final String EDIT_LIST = "UPDATE TABLE_NAME SET Class = ?, Description = ?, " +
+            "DateCreated = ?, DueDate = ?, FileData = ? WHERE id = ?";
 
     private static final String DELETE_LIST = "DELETE FROM TABLE_NAME WHERE id = ?";
 
@@ -129,23 +129,7 @@ public class toDoListDB {
 
     }
 
-
-    public void deleteList(int listID){
-
-        try(Connection connection = DriverManager.getConnection(DB_CONNECTION_URL);
-            PreparedStatement preparedStatement = connection.prepareStatement(DELETE_LIST)){
-
-            preparedStatement.setInt(1, listID);
-            preparedStatement.execute();
-
-
-        }catch (SQLException e){
-            throw new RuntimeException(e);
-        }
-
-    }
-
-    public void editList(String Class, String Desc, Date todayDate, Date dueDateTask, String File_Data){
+    public void editList(String Class, String Desc, Date todayDate, Date dueDateTask, String File_Data, int taskID){
 
         try(Connection connection = DriverManager.getConnection(DB_CONNECTION_URL);
             PreparedStatement preparedStatement = connection.prepareStatement(EDIT_LIST)) {
@@ -161,6 +145,7 @@ public class toDoListDB {
             preparedStatement.setDate(3, date);
             preparedStatement.setDate(4, dueDate);
             preparedStatement.setString(5, File_Data);
+            preparedStatement.setInt(6, taskID);
 
             preparedStatement.execute();
 
@@ -170,4 +155,20 @@ public class toDoListDB {
         }
 
     }
+
+    public void deleteList(int taskID){
+
+        try(Connection connection = DriverManager.getConnection(DB_CONNECTION_URL);
+            PreparedStatement preparedStatement = connection.prepareStatement(DELETE_LIST)){
+
+            preparedStatement.setInt(1, taskID);
+            preparedStatement.execute();
+
+
+        }catch (SQLException e){
+            throw new RuntimeException(e);
+        }
+
+    }
+
 }
