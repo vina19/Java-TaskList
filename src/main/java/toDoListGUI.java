@@ -165,9 +165,7 @@ public class toDoListGUI extends JFrame {
                         descriptionTextField.setText("");
                         fileNameLabel.setText("");
                     }
-
-                    JOptionPane.showMessageDialog(rootPanel, "Task deleted successfully.");
-
+                    
                 } else {
                     JOptionPane.showMessageDialog(rootPanel, "Stop task deletion");
                 }
@@ -228,7 +226,7 @@ public class toDoListGUI extends JFrame {
                 new TableRowSorter<DefaultTableModel>((DefaultTableModel)toDoListTable.getModel());
 
         toDoListTable.setRowSorter(sorter);
-        
+
     }
 
 }
