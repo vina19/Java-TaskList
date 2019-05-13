@@ -62,6 +62,8 @@ public class toDoListGUI extends JFrame {
         configureTable();
         //Adding listeners.
         addListeners();
+        //Clear the TextField
+        emptyTextFields();
         //Sorting data.
         sort();
     }
@@ -78,10 +80,8 @@ public class toDoListGUI extends JFrame {
                 Date dueDate = (Date)DueDateSpinner.getModel().getValue();
                 String fileData = fileNameLabel.getText();
 
-                classTextField.setText("");
-                descriptionTextField.setText("");
+                emptyTextFields();
                 DueDateSpinner.setValue(todayDate);
-                fileNameLabel.setText("");
 
                 if(className == null && descToDoList == null){
                     JOptionPane.showMessageDialog(rootPanel, "Please filled the task information.");
@@ -103,8 +103,8 @@ public class toDoListGUI extends JFrame {
                     //Found this from http://1bestcsharp.blogspot.com/2015/05/java-jtable-add-delete-update-row.html
                     classTextField.setText(toDoListTable.getModel().getValueAt(selectedRowIndex, 1).toString());
                     descriptionTextField.setText(toDoListTable.getModel().getValueAt(selectedRowIndex, 2).toString());
-                    TodaysDateSpinner.setValue(toDoListTable.getModel().getValueAt(selectedRowIndex, 3).toString());
-                    DueDateSpinner.setValue(toDoListTable.getModel().getValueAt(selectedRowIndex, 4).toString());
+                    TodaysDateSpinner.setValue(toDoListTable.getModel().getValueAt(selectedRowIndex, 3));
+                    DueDateSpinner.setValue(toDoListTable.getModel().getValueAt(selectedRowIndex, 4));
                     fileNameLabel.setText(toDoListTable.getModel().getValueAt(selectedRowIndex, 5).toString());
 
                 }catch (IndexOutOfBoundsException i){
@@ -132,6 +132,11 @@ public class toDoListGUI extends JFrame {
 
                         db.editList(class_name, desc_task, today_date, due_date, file_name, task_id);
                         configureTable();
+
+                        emptyTextFields();
+                        DueDateSpinner.setValue(today_date);
+
+
 
                     }else{
                         JOptionPane.showMessageDialog(rootPanel, "Update Error.");
@@ -161,11 +166,9 @@ public class toDoListGUI extends JFrame {
                         int id = (Integer) toDoListTable.getModel().getValueAt(selectedRowIndex, 0);
                         db.deleteList(id);
                         configureTable();
-                        classTextField.setText("");
-                        descriptionTextField.setText("");
-                        fileNameLabel.setText("");
+                        emptyTextFields();
                     }
-                    
+
                 } else {
                     JOptionPane.showMessageDialog(rootPanel, "Stop task deletion");
                 }
@@ -218,6 +221,12 @@ public class toDoListGUI extends JFrame {
         DefaultTableModel tableModel = new DefaultTableModel(data, columnData);
         toDoListTable.setModel(tableModel);
 
+    }
+
+    private void emptyTextFields(){
+        classTextField.setText("");
+        descriptionTextField.setText("");
+        fileNameLabel.setText("");
     }
 
     private void sort(){
