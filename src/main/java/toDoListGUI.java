@@ -72,41 +72,39 @@ public class toDoListGUI extends JFrame {
     }
 
     private void addListeners(){
-        //Creat add new list button listener.
+
         AddNewListButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
                 //Grabbing the text and date from text fields and spinners.
-                String className = classTextField.getText();
-                String descToDoList = descriptionTextField.getText();
-                Date todayDate = (Date)TodaysDateSpinner.getModel().getValue();
-                Date dueDate = (Date)DueDateSpinner.getModel().getValue();
-                String fileData = fileNameLabel.getText();
+                String class_name = classTextField.getText();
+                String task_desc = descriptionTextField.getText();
+                Date date_created = (Date)TodaysDateSpinner.getModel().getValue();
+                Date due_date = (Date)DueDateSpinner.getModel().getValue();
+                String file_data = fileNameLabel.getText();
 
                 //Empty the text fields after adding a new file.
                 emptyTextFields();
                 //Set the due date spinner to today's date.
-                DueDateSpinner.setValue(todayDate);
+                DueDateSpinner.setValue(date_created);
 
-                //If  className and descToDoList text fields empty show message dialog that the user need to fill
-                //the information.
-                if(className == null && descToDoList == null){
+                //If className and descToDoList text fields empty showMessageDialog.
+                if(class_name == null && task_desc == null){
                     JOptionPane.showMessageDialog(rootPanel, "Please filled the task information.");
                 }
 
                 //Take the method from toDoListDb aka db addNewList and add the parameter from the user input.
-                db.addNewList(className, descToDoList, todayDate, dueDate, fileData);
+                db.addNewList(class_name, task_desc, date_created, due_date, file_data);
+
                 //create empty fields in the JTable.
                 configureTable();
             }
         });
 
-        //Create edit button listener
         editButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //try-catch IndexOutOfBoundsException, error message that will show if there is no row selected.
                 try{
                     //Get selected row.
                     int selectedRowIndex = toDoListTable.getSelectedRow();
@@ -124,18 +122,14 @@ public class toDoListGUI extends JFrame {
             }
         });
 
-        //Create save button listener
         saveButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //try-catch IndexOutOfBoundsException, error message that will show that the update is not working
-                //if there is no row selected.
                 try {
                     //Get selected row.
                     int selectedRowIndex = toDoListTable.getSelectedRow();
 
-                    //If there is row selected then get all the fields, date value, and task id from the selected row,
-                    //and then add them into editList method in db file.
+                    //If there is row selected, add data into editList method in db file.
                     if(selectedRowIndex >= 0){
                         String class_name = classTextField.getText();
                         String desc_task = descriptionTextField.getText();
@@ -145,9 +139,8 @@ public class toDoListGUI extends JFrame {
                         int task_id = Integer.parseInt(toDoListTable.getModel().getValueAt(selectedRowIndex, 0).toString());
 
                         db.editList(class_name, desc_task, today_date, due_date, file_name, task_id);
-
-                        //create empty fields in the JTable.
                         configureTable();
+
                         //empty the text fields after saving the task.
                         emptyTextFields();
                         //set the due date spinner to today's date.
@@ -161,31 +154,25 @@ public class toDoListGUI extends JFrame {
             }
         });
 
-        //Create delete button listener
         deleteButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                //Create delete confirmation from the user by showing JOptionPane.showConfirmDialog
-                //which ask if the user want to delete the task with yes_no_option
+                //Create delete confirmation from the user by showing showConfirmDialog.
                 int deleteConfirmation = JOptionPane.showConfirmDialog(null, "Are you sure to delete this task?",
                         null, JOptionPane.YES_NO_OPTION);
 
-                //if deleteConfirmation equals to 0 which mean yes then
-                //get the selected row.
+                //if yes then get the selected row.
                 if (deleteConfirmation == 0) {
                     int selectedRowIndex = toDoListTable.getSelectedRow();
 
                     //if there is no row selected than showMessageDialog or else
-                    //grab the deleteList from db and delete the data by the selected row id.
+                    //grab the deleteList method from db and delete the data by the selected row id.
                     if(selectedRowIndex == -1) {
                         JOptionPane.showMessageDialog(rootPanel, "Please select a task to delete");
                     }else{
                         int id = (Integer) toDoListTable.getModel().getValueAt(selectedRowIndex, 0);
                         db.deleteList(id);
-
-                        //create empty fields in the JTable.
                         configureTable();
-                        //empty the text fields after user delete the selected row data.
                         emptyTextFields();
                     }
                 } else {
@@ -194,22 +181,21 @@ public class toDoListGUI extends JFrame {
             }
         });
 
-        //Create done button listener
         doneButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //try-catch exception
                 try {
                     //get selected row
-                    int selectedRowIndex = toDoListTable.getSelectedRow();
+                    int selected_row = toDoListTable.getSelectedRow();
 
                     //if there is no row selected showMessageDialog.
                     //Else grab the deleteList from db and delete the data by the selected row id which indicate
                     //that the user done with the task by showing showMessageDialog.
-                    if (selectedRowIndex == -1) {
+                    if (selected_row == -1) {
                         JOptionPane.showMessageDialog(rootPanel, "Please select a completed task.");
                     } else {
-                        int id = (Integer) toDoListTable.getModel().getValueAt(selectedRowIndex, 0);
+                        int id = (Integer) toDoListTable.getModel().getValueAt(selected_row, 0);
                         db.deleteList(id);
                         configureTable();
                         JOptionPane.showMessageDialog(rootPanel, "Awesome! You did this task.");
@@ -220,7 +206,6 @@ public class toDoListGUI extends JFrame {
             }
         });
 
-        //Create select file button
         selectAFileButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -242,20 +227,24 @@ public class toDoListGUI extends JFrame {
 
     private void configureTable(){
 
+        //Create Vector for columnData which hold column names and data which hold all data.
         Vector columnData = db.getColumnToDoLists();
         Vector<Vector> data = db.getAllLists();
 
+        //Set table model
         DefaultTableModel tableModel = new DefaultTableModel(data, columnData);
         toDoListTable.setModel(tableModel);
 
     }
 
+    //Clear all the fields.
     private void emptyTextFields(){
         classTextField.setText("");
         descriptionTextField.setText("");
         fileNameLabel.setText("");
     }
 
+    //Sort the data by the column header.
     private void sort(){
 
         TableRowSorter<DefaultTableModel> sorter =
