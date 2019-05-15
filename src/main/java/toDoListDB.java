@@ -12,7 +12,7 @@ public class toDoListDB {
     private static final String DB_CONNECTION_URL = "jdbc:sqlite:ToDoList.sqlite";
 
     private static final String TABLE_NAME = "to_do_list_manager";
-    private static final String ID_COL = "task_id";
+    private static final String ID_COL = "id";
     private static final String NAME_COL = "class_name";
     private static final String DESC_COL = "task_desc";
     private static final String DATE_COL = "date_created";
@@ -20,18 +20,18 @@ public class toDoListDB {
     private static final String FILE_COL = "file_data";
 
     //Create table in table to_do_list_manager.
-    private static final String CREATE_TO_DO_LIST_TABLE = "CREATE TABLE IF NOT EXISTS TABLE_NAME (task_id INTEGER PRIMARY KEY, " +
-            "class_name TEXT, task_desc TEXT, date_created DATE, due_date DATE, file_data TEXT)";
+    private static final String CREATE_TO_DO_LIST_TABLE = "CREATE TABLE IF NOT EXISTS TABLE_NAME (" +
+            "id INTEGER PRIMARY KEY, class_name TEXT, task_desc TEXT, date_created DATE, due_date DATE, file_data TEXT)";
 
     //Get everything from the table method.
     private static final String GET_ALL_LISTS = "SELECT * FROM TABLE_NAME ";
 
     //Update table by id.
     private static final String EDIT_LIST = "UPDATE TABLE_NAME SET class_name = ?, task_desc = ?, " +
-            "date_created = ?, due_date = ?, file_data = ? WHERE task_id = ?";
+            "date_created = ?, due_date = ?, file_data = ? WHERE id = ?";
 
     //Delete data by id.
-    private static final String DELETE_LIST = "DELETE FROM TABLE_NAME WHERE task_id = ?";
+    private static final String DELETE_LIST = "DELETE FROM TABLE_NAME WHERE id = ?";
 
     //Insert data to table.
     private static final String ADD_TO_DO_LIST = "INSERT INTO TABLE_NAME " +
